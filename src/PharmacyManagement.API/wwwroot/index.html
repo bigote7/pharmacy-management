@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Pharmacie - Administration</title>
+    <link rel="stylesheet" href="admin-theme.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏥 Système de Gestion de Pharmacie</h1>
+            <div id="user-info" style="text-align: right; margin-top: 10px; font-size: 0.9em;"></div>
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="tab-btn" data-tab="medicaments">💊 Médicaments</button>
+                <button class="tab-btn" data-tab="clients">👥 Clients</button>
+                <button class="tab-btn" data-tab="ventes">💰 Ventes</button>
+                <button class="tab-btn" data-tab="stocks">📦 Stocks</button>
+                <button class="tab-btn" data-tab="commandes">📋 Commandes</button>
+                <button class="tab-btn" data-tab="fournisseurs">🏢 Fournisseurs</button>
+                <button class="tab-btn" data-tab="prescriptions">📝 Prescriptions</button>
+                <button class="tab-btn" data-tab="alertes" id="alertes-btn">
+                    🔔 Alertes
+                    <span id="alertes-badge" class="alert-badge" style="display: none;">0</span>
+                </button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Section Dashboard -->
+            <section id="dashboard" class="tab-content active">
+                <h2>Tableau de Bord</h2>
+                <div id="dashboard-content"></div>
+            </section>
+
+            <!-- Section Médicaments -->
+            <section id="medicaments" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Médicaments</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="search-medicaments" placeholder="🔍 Rechercher..." class="search-input" onkeyup="searchMedicaments()">
+                        <button class="btn btn-primary" onclick="showAddMedicamentForm()">+ Ajouter</button>
+                    </div>
+                </div>
+                <div id="medicaments-list" class="cards-grid"></div>
+            </section>
+
+            <!-- Section Clients -->
+            <section id="clients" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Clients</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="search-clients" placeholder="🔍 Rechercher..." class="search-input" onkeyup="searchClients()">
+                        <button class="btn btn-primary" onclick="showAddClientForm()">+ Ajouter</button>
+                    </div>
+                </div>
+                <div id="clients-list" class="cards-grid"></div>
+            </section>
+
+            <!-- Section Ventes -->
+            <section id="ventes" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Ventes</h2>
+                    <button class="btn btn-primary" onclick="showAddVenteForm()">+ Nouvelle Vente</button>
+                </div>
+                <div id="ventes-list" class="table-container"></div>
+            </section>
+
+            <!-- Section Stocks -->
+            <section id="stocks" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Stocks</h2>
+                    <button class="btn btn-primary" onclick="showAddStockForm()">+ Ajouter Stock</button>
+                </div>
+                <div id="stocks-list" class="table-container"></div>
+            </section>
+
+            <!-- Section Commandes -->
+            <section id="commandes" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Commandes</h2>
+                    <button class="btn btn-primary" onclick="showAddCommandeForm()">+ Nouvelle Commande</button>
+                </div>
+                <div id="commandes-list" class="table-container"></div>
+            </section>
+
+            <!-- Section Fournisseurs -->
+            <section id="fournisseurs" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Fournisseurs</h2>
+                    <button class="btn btn-primary" onclick="showAddFournisseurForm()">+ Ajouter Fournisseur</button>
+                </div>
+                <div id="fournisseurs-list" class="cards-grid"></div>
+            </section>
+
+            <!-- Section Prescriptions -->
+            <section id="prescriptions" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Prescriptions</h2>
+                    <button class="btn btn-primary" onclick="showAddPrescriptionForm()">+ Nouvelle Prescription</button>
+                </div>
+                <div id="prescriptions-list" class="table-container"></div>
+            </section>
+
+            <!-- Section Alertes -->
+            <section id="alertes" class="tab-content">
+                <div class="section-header">
+                    <h2>🔔 Alertes et Notifications</h2>
+                    <button class="btn btn-primary" onclick="refreshAlertes()">🔄 Actualiser</button>
+                </div>
+                <div id="alertes-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals et Forms -->
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js?v=2"></script>
+</body>
+</html>
+

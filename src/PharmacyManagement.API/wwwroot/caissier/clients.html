@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Clients - Caissier</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/caissier/caissier.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-cash-register"></i> Point de Vente
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="dashboard.html">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a class="nav-link" href="vente.html">
+                    <i class="bi bi-cart-plus"></i> Nouvelle Vente
+                </a>
+                <a class="nav-link" href="#" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="padding: 20px 15px;">
+        <div class="row g-3">
+            <div class="col-md-2 sidebar">
+                <div class="list-group">
+                    <a href="dashboard.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a href="vente.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cart-plus"></i> Nouvelle Vente
+                    </a>
+                    <a href="historique.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-clock-history"></i> Historique
+                    </a>
+                    <a href="clients.html" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-people"></i> Clients
+                    </a>
+                    <a href="alertes.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-exclamation-triangle"></i> Alertes
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-10">
+                <h2 class="mb-4"><i class="bi bi-people"></i> Gestion des Clients</h2>
+
+                <!-- Recherche -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" id="client-search" class="form-control" 
+                                   placeholder="Rechercher un client (nom, prénom, téléphone, email)..." 
+                                   onkeyup="rechercherClients()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Résultats -->
+                <div id="clients-results">
+                    <p class="text-muted text-center">Commencez à rechercher un client...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/caissier/caissier.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
+        });
+
+        async function rechercherClients() {
+            const terme = document.getElementById('client-search').value.trim();
+            if (terme.length < 2) {
+                document.getElementById('clients-results').innerHTML = 
+                    '<p class="text-muted text-center">Tapez au moins 2 caractères...</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/clients/rechercher?terme=${encodeURIComponent(terme)}`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({ error: 'Erreur de recherche' }));
+                    throw new Error(error.error || 'Erreur de recherche');
+                }
+
+                const clients = await response.json();
+
+                if (!clients || clients.length === 0) {
+                    document.getElementById('clients-results').innerHTML = 
+                        '<p class="text-muted text-center">Aucun client trouvé</p>';
+                    return;
+                }
+
+                const html = clients.map(c => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="mb-1">${c.nom || ''} ${c.prenom || ''}</h5>
+                                    <p class="mb-1 text-muted">
+                                        <i class="bi bi-telephone"></i> ${c.telephone || 'Non renseigné'}<br>
+                                        <i class="bi bi-envelope"></i> ${c.email || 'Non renseigné'}<br>
+                                        <i class="bi bi-geo-alt"></i> ${c.adresse || 'Non renseigné'}
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button class="btn btn-primary" onclick="utiliserClient(${c.id})">
+                                        <i class="bi bi-check-circle"></i> Utiliser
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('clients-results').innerHTML = html;
+            } catch (error) {
+                console.error('Erreur recherche clients:', error);
+                document.getElementById('clients-results').innerHTML = 
+                    '<p class="text-danger text-center">Erreur: ' + error.message + '</p>';
+            }
+        }
+
+        function utiliserClient(clientId) {
+            // Rediriger vers la page de vente avec le client pré-sélectionné
+            window.location.href = `vente.html?clientId=${clientId}`;
+        }
+    </script>
+</body>
+</html>
+

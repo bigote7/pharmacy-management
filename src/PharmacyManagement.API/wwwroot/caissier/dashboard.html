@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Caissier - Gestion de Pharmacie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/caissier/caissier.css">
+</head>
+<body>
+    <!-- Header Moderne et Professionnel -->
+    <header class="modern-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="bi bi-capsule-pill"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1 class="logo-title">Pharmacie POS</h1>
+                        <p class="logo-subtitle">Système de Vente</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <nav class="header-nav">
+                    <a href="dashboard.html" class="nav-item active" title="Dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="vente.html" class="nav-item" title="Nouvelle Vente">
+                        <i class="bi bi-cart-plus"></i>
+                        <span>Nouvelle Vente</span>
+                    </a>
+                    <a href="historique.html" class="nav-item" title="Historique">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Historique</span>
+                    </a>
+                    <a href="clients.html" class="nav-item" title="Clients">
+                        <i class="bi bi-people"></i>
+                        <span>Clients</span>
+                    </a>
+                </nav>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name" id="header-username">Caissier</span>
+                            <span class="user-role">Point de Vente</span>
+                        </div>
+                    </div>
+                    <div class="header-buttons">
+                        <button class="btn-icon" onclick="loadDashboard()" title="Actualiser">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        <button class="btn-icon" onclick="logout()" title="Déconnexion">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid" style="padding: 20px 15px;">
+        <div class="row g-3">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <div class="list-group">
+                    <a href="dashboard.html" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a href="vente.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cart-plus"></i> Nouvelle Vente
+                    </a>
+                    <a href="historique.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-clock-history"></i> Historique
+                    </a>
+                    <a href="clients.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-people"></i> Clients
+                    </a>
+                    <a href="alertes.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-exclamation-triangle"></i> Alertes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0" style="color: var(--secondary-green); font-weight: 800;">
+                        <i class="bi bi-speedometer2"></i> Dashboard Caissier
+                    </h2>
+                    <button class="btn btn-outline-primary" onclick="loadDashboard()" title="Actualiser">
+                        <i class="bi bi-arrow-clockwise"></i> Actualiser
+                    </button>
+                </div>
+
+                <!-- Statistiques -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card gradient-blue">
+                            <div class="stat-icon"><i class="bi bi-cart-check"></i></div>
+                            <div class="stat-content">
+                                <h3 id="total-ventes">0</h3>
+                                <p>Ventes Aujourd'hui</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card gradient-purple">
+                            <div class="stat-icon"><i class="bi bi-currency-exchange"></i></div>
+                            <div class="stat-content">
+                                <h3 id="chiffre-affaires">0.00 MAD</h3>
+                                <p>Chiffre d'Affaires</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card gradient-indigo">
+                            <div class="stat-icon"><i class="bi bi-calendar-month"></i></div>
+                            <div class="stat-content">
+                                <h3 id="chiffre-mois">0.00 MAD</h3>
+                                <p>CA du Mois</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card gradient-pink">
+                            <div class="stat-icon"><i class="bi bi-people"></i></div>
+                            <div class="stat-content">
+                                <h3 id="nombre-clients">0</h3>
+                                <p>Clients Servis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Médicaments Plus Vendus -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-gradient-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-trophy"></i> Médicaments Plus Vendus</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Médicament</th>
+                                                <th>Quantité</th>
+                                                <th>CA</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="medicaments-vendus">
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4">
+                                                    <div class="loading-spinner mx-auto"></div>
+                                                    <p class="mt-2 text-muted">Chargement...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertes Stock Faible -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-gradient-danger text-white">
+                                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Alertes Stock Faible</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Médicament</th>
+                                                <th>Stock</th>
+                                                <th>Minimum</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="alertes-stock">
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4">
+                                                    <div class="loading-spinner mx-auto"></div>
+                                                    <p class="mt-2 text-muted">Chargement...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ventes Récentes -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-gradient-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Ventes Récentes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Facture</th>
+                                                <th>Date</th>
+                                                <th>Client</th>
+                                                <th>Montant</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ventes-recentes">
+                                            <tr>
+                                                <td colspan="5" class="text-center py-4">
+                                                    <div class="loading-spinner mx-auto"></div>
+                                                    <p class="mt-2 text-muted">Chargement...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/caissier/caissier.js"></script>
+    <script>
+        // Charger le dashboard au démarrage
+        // Charger les informations utilisateur dans le header
+        function chargerInfoUtilisateur() {
+            try {
+                const userStr = localStorage.getItem('user');
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    const username = user.fullName || user.username || user.FullName || user.Username || 'Caissier';
+                    const headerUsername = document.getElementById('header-username');
+                    if (headerUsername) {
+                        headerUsername.textContent = username;
+                    }
+                }
+            } catch (error) {
+                console.warn('Impossible de charger les infos utilisateur:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
+            
+            // Charger les informations utilisateur
+            chargerInfoUtilisateur();
+            
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            // Afficher l'indicateur de chargement
+            document.getElementById('medicaments-vendus').innerHTML = 
+                '<tr><td colspan="3" class="text-center py-4"><div class="loading-spinner mx-auto"></div><p class="mt-2 text-muted">Chargement...</p></td></tr>';
+            document.getElementById('alertes-stock').innerHTML = 
+                '<tr><td colspan="3" class="text-center py-4"><div class="loading-spinner mx-auto"></div><p class="mt-2 text-muted">Chargement...</p></td></tr>';
+            document.getElementById('ventes-recentes').innerHTML = 
+                '<tr><td colspan="5" class="text-center py-4"><div class="loading-spinner mx-auto"></div><p class="mt-2 text-muted">Chargement...</p></td></tr>';
+            
+            try {
+                const response = await fetch('/api/caissier/dashboard', {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Erreur lors du chargement');
+
+                const data = await response.json();
+                
+                // Mettre à jour les statistiques avec animation
+                updateStatWithAnimation('total-ventes', data.totalVentesAujourdhui || 0, false);
+                updateStatWithAnimation('chiffre-affaires', data.chiffreAffairesAujourdhui || 0, true);
+                updateStatWithAnimation('chiffre-mois', data.chiffreAffairesMois || 0, true);
+                updateStatWithAnimation('nombre-clients', data.nombreClientsAujourdhui || 0, false);
+
+                // Les valeurs sont animées dans la fonction animateValue appelée plus haut
+
+                // Médicaments plus vendus
+                const medicamentsHtml = (data.medicamentsPlusVendus || []).map(m => `
+                    <tr>
+                        <td>${m.nom}</td>
+                        <td><span class="badge bg-primary">${m.quantiteVendue}</span></td>
+                        <td>${m.chiffreAffaires.toFixed(2)} MAD</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="3" class="text-center">Aucune donnée</td></tr>';
+                document.getElementById('medicaments-vendus').innerHTML = medicamentsHtml;
+
+                // Alertes stock
+                const alertesHtml = (data.alertesStockFaible || []).slice(0, 5).map(a => `
+                    <tr>
+                        <td>${a.nom}</td>
+                        <td><span class="badge bg-danger">${a.stockDisponible}</span></td>
+                        <td>${a.stockMinimum}</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="3" class="text-center">Aucune alerte</td></tr>';
+                document.getElementById('alertes-stock').innerHTML = alertesHtml;
+
+                // Ventes récentes
+                const ventesHtml = (data.ventesRecentes || []).map(v => `
+                    <tr>
+                        <td>${v.numeroFacture}</td>
+                        <td>${new Date(v.dateVente).toLocaleDateString('fr-FR')}</td>
+                        <td>${v.clientNom || 'Non renseigné'}</td>
+                        <td><strong>${v.montantTotal.toFixed(2)} MAD</strong></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="voirVente(${v.id})">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" class="text-center">Aucune vente</td></tr>';
+                document.getElementById('ventes-recentes').innerHTML = ventesHtml;
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement du dashboard: ' + error.message);
+            }
+        }
+
+        function voirVente(id) {
+            window.location.href = `historique.html?id=${id}`;
+        }
+        
+        // Fonction d'animation des valeurs
+        function updateStatWithAnimation(id, endValue, isCurrency) {
+            const element = document.getElementById(id);
+            if (!element) return;
+            
+            const startValue = isCurrency 
+                ? parseFloat(element.textContent.replace(' MAD', '').replace(' ', '')) || 0
+                : parseInt(element.textContent) || 0;
+            
+            const duration = 1000; // 1 seconde
+            const range = endValue - startValue;
+            const steps = 60;
+            const increment = range / steps;
+            const stepTime = duration / steps;
+            let current = startValue;
+            let step = 0;
+            
+            const timer = setInterval(() => {
+                step++;
+                current = startValue + (increment * step);
+                
+                if (step >= steps || (increment > 0 && current >= endValue) || (increment < 0 && current <= endValue)) {
+                    current = endValue;
+                    clearInterval(timer);
+                }
+                
+                if (isCurrency) {
+                    element.textContent = current.toFixed(2) + ' MAD';
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, stepTime);
+        }
+    </script>
+</body>
+</html>
+

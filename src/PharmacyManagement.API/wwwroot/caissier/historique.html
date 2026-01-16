@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des Ventes - Caissier</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/caissier/caissier.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-cash-register"></i> Point de Vente
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="dashboard.html">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a class="nav-link" href="vente.html">
+                    <i class="bi bi-cart-plus"></i> Nouvelle Vente
+                </a>
+                <a class="nav-link" href="#" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="padding: 20px 15px;">
+        <div class="row g-3">
+            <div class="col-md-2 sidebar">
+                <div class="list-group">
+                    <a href="dashboard.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a href="vente.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cart-plus"></i> Nouvelle Vente
+                    </a>
+                    <a href="historique.html" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-clock-history"></i> Historique
+                    </a>
+                    <a href="clients.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-people"></i> Clients
+                    </a>
+                    <a href="alertes.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-exclamation-triangle"></i> Alertes
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-10">
+                <h2 class="mb-4"><i class="bi bi-clock-history"></i> Historique des Ventes</h2>
+
+                <!-- Filtres -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Date début</label>
+                                <input type="date" id="date-debut" class="form-control" 
+                                       value="${new Date(new Date().setDate(1)).toISOString().split('T')[0]}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date fin</label>
+                                <input type="date" id="date-fin" class="form-control" 
+                                       value="${new Date().toISOString().split('T')[0]}">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button class="btn btn-primary w-100" onclick="filtrerVentes()">
+                                    <i class="bi bi-funnel"></i> Filtrer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tableau des ventes -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Facture</th>
+                                        <th>Date</th>
+                                        <th>Client</th>
+                                        <th>Articles</th>
+                                        <th>Montant</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ventes-table">
+                                    <tr><td colspan="7" class="text-center">Chargement...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal détails vente -->
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-receipt"></i> Détails de la Vente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="details-content">
+                    <p class="text-center">Chargement...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" onclick="imprimerFacture()">
+                        <i class="bi bi-printer"></i> Imprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/caissier/caissier.js"></script>
+    <script>
+        let currentVenteId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
+            filtrerVentes();
+        });
+
+        async function filtrerVentes() {
+            const dateDebut = document.getElementById('date-debut').value;
+            const dateFin = document.getElementById('date-fin').value;
+
+            try {
+                const url = `${API_BASE}/ventes/historique?dateDebut=${dateDebut}&dateFin=${dateFin}`;
+                const response = await fetch(url, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Erreur lors du chargement');
+
+                const ventes = await response.json();
+
+                if (ventes.length === 0) {
+                    document.getElementById('ventes-table').innerHTML = 
+                        '<tr><td colspan="7" class="text-center">Aucune vente trouvée</td></tr>';
+                    return;
+                }
+
+                const html = ventes.map(v => `
+                    <tr>
+                        <td><strong>${v.numeroFacture}</strong></td>
+                        <td>${new Date(v.dateVente).toLocaleDateString('fr-FR')}</td>
+                        <td>${v.clientNom || 'Non renseigné'}</td>
+                        <td><span class="badge bg-info">${v.nombreArticles}</span></td>
+                        <td><strong>${v.montantTotal.toFixed(2)} MAD</strong></td>
+                        <td>
+                            <span class="badge ${v.statut === 'Normal' ? 'bg-success' : v.statut === 'Annulee' ? 'bg-danger' : 'bg-warning'}">
+                                ${v.statut}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="voirDetails(${v.id})">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            ${v.statut === 'Normal' ? `
+                                <button class="btn btn-sm btn-outline-danger" onclick="annulerVente(${v.id})">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('ventes-table').innerHTML = html;
+            } catch (error) {
+                console.error(error);
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        async function voirDetails(id) {
+            currentVenteId = id;
+            try {
+                const response = await fetch(`${API_BASE}/ventes/${id}`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) throw new Error('Erreur');
+
+                const vente = await response.json();
+
+                const html = `
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Facture:</strong> ${vente.numeroFacture}<br>
+                            <strong>Date:</strong> ${new Date(vente.dateVente).toLocaleString('fr-FR')}<br>
+                            <strong>Client:</strong> ${vente.clientNom || 'Non renseigné'}
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h4>Total: ${vente.montantTotal.toFixed(2)} MAD</h4>
+                            <small>TVA: ${vente.montantTVA.toFixed(2)} MAD</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5>Articles:</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Médicament</th>
+                                <th>Quantité</th>
+                                <th>Prix unitaire</th>
+                                <th>Sous-total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${vente.lignes.map(l => `
+                                <tr>
+                                    <td>${l.medicamentNom}</td>
+                                    <td>${l.quantite}</td>
+                                    <td>${l.prixUnitaire.toFixed(2)} MAD</td>
+                                    <td>${l.sousTotal.toFixed(2)} MAD</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('details-content').innerHTML = html;
+                const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+                modal.show();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        function imprimerFacture() {
+            if (currentVenteId) {
+                window.open(`${API_BASE}/ventes/${currentVenteId}/facture-pdf`, '_blank');
+            }
+        }
+
+        function annulerVente(id) {
+            const raison = prompt('Raison de l\'annulation:');
+            if (!raison) return;
+
+            if (!confirm('Êtes-vous sûr de vouloir annuler cette vente ?')) return;
+
+            fetch(`${API_BASE}/ventes/${id}/annuler`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ raison })
+            })
+            .then(r => {
+                if (r.ok) {
+                    alert('Vente annulée avec succès');
+                    filtrerVentes();
+                } else {
+                    alert('Erreur lors de l\'annulation');
+                }
+            })
+            .catch(err => alert('Erreur: ' + err.message));
+        }
+    </script>
+</body>
+</html>
+
