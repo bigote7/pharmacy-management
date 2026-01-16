@@ -16,7 +16,7 @@ Une application complète de gestion de pharmacie développée en **.NET 8** ave
 
 ## 🎯 Aperçu
 
-Ce système de gestion de pharmacie est conçu pour répondre aux besoins quotidiens des pharmaciens et de leur équipe. Il offre une interface intuitive pour gérer les médicaments, suivre les stocks, traiter les ventes, gérer les clients et fournisseurs, tout en respectant les normes pharmaceutiques en vigueur.
+Ce système de gestion de pharmacie développée par LABIB LAYACHI  est conçu pour répondre aux besoins quotidiens des pharmaciens et de leur équipe. Il offre une interface intuitive pour gérer les médicaments, suivre les stocks, traiter les ventes, gérer les clients et fournisseurs, tout en respectant les normes pharmaceutiques en vigueur.
 
 **Caractéristiques principales :**
 - ✅ Gestion complète des médicaments et stocks
